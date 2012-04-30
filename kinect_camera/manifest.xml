@@ -26,10 +26,12 @@
   <depend package="image_transport" />
   <depend package="image_geometry" />
   <depend package="sensor_msgs" />
-  <depend package="freenect" />
   <depend package="dynamic_reconfigure" />
-  <depend package="eigen" />
   <depend package="cv_bridge" />
+  <depend package="freenect" />
+  
+  <!--rosdep name="libfreenect" /-->
+  <rosdep name="eigen" />
 
   <export>
     <cpp cflags="-I${prefix}/include" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -lkinect_driver -lkinect_driver_nodelets" />

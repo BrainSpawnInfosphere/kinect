@@ -42,6 +42,8 @@
 #include <sensor_msgs/image_encodings.h>
 #include <cv_bridge/CvBridge.h>
 #include <boost/make_shared.hpp>
+//#include <libfreenect.h>
+//#include <libfreenect_sync.h>
 
 namespace kinect_camera 
 {
@@ -145,9 +147,9 @@ KinectDriver::KinectDriver (ros::NodeHandle comm_nh, ros::NodeHandle param_nh)
   ROS_INFO ("[KinectDriver] Calibration URLs:\n\tRGB: %s\n\tDepth: %s",
             rgb_info_url.c_str (), depth_info_url.c_str ());
 
-  rgb_info_manager_   = boost::make_shared<CameraInfoManager> (ros::NodeHandle(comm_nh, "rgb"),
+  rgb_info_manager_   = boost::make_shared<camera_info_manager::CameraInfoManager> (ros::NodeHandle(comm_nh, "rgb"),
                                                                cam_name, rgb_info_url);
-  depth_info_manager_ = boost::make_shared<CameraInfoManager> (ros::NodeHandle(comm_nh, "depth"),
+  depth_info_manager_ = boost::make_shared<camera_info_manager::CameraInfoManager> (ros::NodeHandle(comm_nh, "depth"),
                                                                cam_name, depth_info_url);
   rgb_info_   = rgb_info_manager_->getCameraInfo ();
   depth_info_ = depth_info_manager_->getCameraInfo ();

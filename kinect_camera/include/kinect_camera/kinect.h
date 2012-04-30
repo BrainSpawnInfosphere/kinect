@@ -145,7 +145,7 @@ namespace kinect_camera
       ros::Publisher pub_imu_;
 
       /** \brief Camera info manager objects. */
-      boost::shared_ptr<CameraInfoManager> rgb_info_manager_, depth_info_manager_;
+      boost::shared_ptr<camera_info_manager::CameraInfoManager> rgb_info_manager_, depth_info_manager_;
       image_geometry::PinholeCameraModel rgb_model_, depth_model_;
 
       /** \brief Dynamic reconfigure. */
