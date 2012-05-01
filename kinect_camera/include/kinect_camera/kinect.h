@@ -112,9 +112,7 @@ namespace kinect_camera
       /** \brief Check whether it's time to exit. 
         * \return true if we're still OK, false if it's time to exit
         */
-      inline bool 
-        ok ()
-      {
+      inline bool ok(){
         freenect_raw_device_state *state;
         freenect_update_device_state (f_dev_);
         state = freenect_get_device_state (f_dev_);
