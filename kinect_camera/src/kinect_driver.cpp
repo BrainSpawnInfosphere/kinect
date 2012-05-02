@@ -646,6 +646,9 @@ void
                         boost::make_shared<const sensor_msgs::CameraInfo> (rgb_info_));
     if (pub_rgb_rect_.getNumSubscribers () > 0 && have_rgb)
     {
+      ////////////////////////////////
+      // FIXME
+      ////////////////////////////////
       IplImage ipl = rgb_rect_;
       sensor_msgs::ImagePtr msg_ptr = sensor_msgs::CvBridge::cvToImgMsg(&ipl, "rgb8");
       msg_ptr->header.stamp = time;
@@ -748,7 +751,7 @@ void KinectDriver::depthBufferTo8BitImage(const freenect_depth * buf)
 {
     memcpy((void*)&depth_image_.data[0], (void*)buf, width_*height_*sizeof(unsigned short));
     return;
-    
+    /*
   double fT = depth_model_.fx() * baseline_;
   
   for (int y=0; y<height_; ++y)
@@ -767,6 +770,7 @@ void KinectDriver::depthBufferTo8BitImage(const freenect_depth * buf)
 
     depth_image_.data[index] = color;
   }
+  */
 }
 
 } // namespace kinect_camera

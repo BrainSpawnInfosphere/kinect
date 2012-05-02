@@ -12,7 +12,7 @@
 
 This stack was resurrected from the old kinect tools which used libfreenect. 
 
-# ROS Node: Kinect Camera Node
+## ROS Node: Kinect Camera Node
 
 **Current Author:** Kevin Walchko
 
@@ -22,11 +22,15 @@ This stack was resurrected from the old kinect tools which used libfreenect.
 
 **Website:** http://github.com/walchko/kinect/kinect_camera
 
-## Command Line
+### Command Line
 
 	rosrun kinect_camera kinect_node
+	
+#### Example:
 
-### Published Topics: 
+    rosrun kinect_camera kinect_node
+
+#### Published Topics: 
 **RGB Image:** 
 
 "/camera/rgb/image_raw" Raw RGB image from camera
@@ -41,7 +45,7 @@ This stack was resurrected from the old kinect tools which used libfreenect.
 
 "/camera/imu" The readings from the accelerometers in the connect
 
-## To Do
+### To Do
 
 * Further clean-up and bring code up to Fuerte API standards
 * Add motor control
@@ -51,7 +55,7 @@ This stack was resurrected from the old kinect tools which used libfreenect.
 * Figure out what to do with the included freenect package
 
 
-# ROS Node: Kinect Camera Point Cloud Viewer
+## ROS Node: Kinect Camera Point Cloud Viewer
 
 **Author:** Kevin Walchko
 
@@ -64,15 +68,15 @@ This stack was resurrected from the old kinect tools which used libfreenect.
 A Glut window which converts the kinect depth image (uint_16) into a pcl::PointCloud<PointXYZ> 
 and displays it in 3D. The window allows the user to rotate and zoom the point cloud.
 
-## Command Line
+### Command Line
 
 	rosrun pcl pcl
 
-### Example:
+#### Example:
 
  	rosrun pcl pcl
 
-## To Do
+### To Do
 
 * Clean-up code
 * Handle coloring the point cloud better
