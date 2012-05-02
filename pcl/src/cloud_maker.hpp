@@ -78,6 +78,61 @@ float PURPLE[] = {1,0,1,1};
 #include <algorithm>
 #include <limits>
 
+class Colorize {
+public:
+    Colorize(){
+        int i;
+        for (i=0; i<2048; i++) {
+            float v = i/2048.0;
+            v = powf(v, 3)* 6;
+            t_gamma[i] = v*6*256;
+        }
+	}
+	
+	inline void depthColor(const unsigned short depth, unsigned char* depth_mid){
+		int pval = t_gamma[depth];
+		int lb = pval & 0xff;
+		switch (pval>>8) { // switch on significant bits
+			case 0:
+				depth_mid[0] = 255;
+				depth_mid[1] = 255-lb;
+				depth_mid[2] = 255-lb;
+				break;
+			case 1:
+				depth_mid[0] = 255;
+				depth_mid[1] = lb;
+				depth_mid[2] = 0;
+				break;
+			case 2:
+				depth_mid[0] = 255-lb;
+				depth_mid[1] = 255;
+				depth_mid[2] = 0;
+				break;
+			case 3:
+				depth_mid[0] = 0;
+				depth_mid[1] = 255;
+				depth_mid[2] = lb;
+				break;
+			case 4:
+				depth_mid[0] = 0;
+				depth_mid[1] = 255-lb;
+				depth_mid[2] = 255;
+				break;
+			case 5:
+				depth_mid[0] = 0;
+				depth_mid[1] = 0;
+				depth_mid[2] = 255-lb;
+				break;
+			default:
+				depth_mid[0] = 0;
+				depth_mid[1] = 0;
+				depth_mid[2] = 0;
+				break;
+		}
+	}
+
+    unsigned short t_gamma[2048];
+};
 
 namespace enc = sensor_msgs::image_encodings;
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
@@ -85,7 +140,7 @@ typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
 class CloudMaker {
 public:
     CloudMaker() : cloud (new PointCloud){
-        ;
+        color_buff = new unsigned char[640*480*3];
     }
     
     ~CloudMaker(){;}
@@ -111,11 +166,13 @@ public:
         const double fT = model.fx() * baseline_;
         
         // can I do this in one loop?
+        int k=0;
         for (int v = 0; v < height_; ++v) // rows
         {
-          for (int u = 0; u < width_; ++u) // cols
+          for (int u = 0; u < width_; ++u, k+=3) // cols
           {
-            double d = SHIFT_SCALE * (shift_offset_ - (double)(depth.at<T>(v,u))); // disparity
+            unsigned short pixel = depth.at<T>(v,u);
+            double d = SHIFT_SCALE * (shift_offset_ - (double)(pixel)); // disparity
             if (d <= 0.0) // div by zero
               continue;
     
@@ -125,27 +182,12 @@ public:
             pt.x = ((u - model.cx()) / model.fx()) * pt.z;
             pt.y = ((v - model.cy()) / model.fy()) * pt.z;
             
-            if(pt.z < 0.01) continue;
+            //if(pt.z < 0.01) continue;
             
             cloud->points.push_back(pt);
             //ROS_INFO("%f %f %f",pt.x,pt.y,pt.z);
-    
-            /*
-            // Fill in RGB from corresponding pixel in rectified RGB image
-            Eigen::Vector4d uvd1;
-            uvd1 << u, v, d, 1;
-            Eigen::Vector3d uvw;
-            uvw = depth_to_rgb_ * uvd1;
-            int u_rgb = uvw[0]/uvw[2] + 0.5;
-            int v_rgb = uvw[1]/uvw[2] + 0.5;
             
-            int32_t rgb_packed = 0;
-            if (u_rgb >= 0 && u_rgb < width_ && v_rgb >= 0 && v_rgb < height_) {
-              cv::Vec3b rgb = rgb_rect_.at<cv::Vec3b>(v_rgb, u_rgb);
-              rgb_packed = (rgb[0] << 16) | (rgb[1] << 8) | rgb[2];
-            }
-            cloud_.channels[0].values.push_back(*(float*)(&rgb_packed));
-            */
+            depthColor.depthColor(pixel,&color_buff[k]);
           }
         }
 #elif 0 // not sure value? use pinhole camerea model ray to 3d    
@@ -238,14 +280,17 @@ public:
             
         else if (depth_msg->encoding == enc::MONO8){
             //convert<float>(depth_msg, cloud_msg);
-            //ROS_INFO("MONO8");
-            cv_msg = cv_bridge::toCvCopy(depth_msg, "mono8");
-            fillCloud<unsigned char>(cv_msg->image);
+            ROS_INFO("MONO8 not supported");
+            //cv_msg = cv_bridge::toCvCopy(depth_msg, "mono8");
+            //fillCloud<unsigned char>(cv_msg->image);
         }
             
-        else if (depth_msg->encoding == enc::MONO16)
+        else if (depth_msg->encoding == enc::MONO16){
             //convert<float>(depth_msg, cloud_msg);
-            ROS_INFO("MONO16 not supported");
+            //ROS_INFO("MONO16 not supported");
+            cv_msg = cv_bridge::toCvCopy(depth_msg, "mono16");
+            fillCloud<unsigned short>(cv_msg->image);
+        }
 
         else
         {
@@ -288,10 +333,14 @@ public:
     }
     
     void gl(){
+        //glShadeModel(GL_FLAT);
         boost::mutex::scoped_lock lock (buffer_mutex);
         glBegin(GL_POINTS);
-            for (size_t i = 0; i < cloud->points.size (); ++i) 
+            int k=0;
+            for (size_t i = 0; i < cloud->points.size (); ++i, k+=3) {
+                glColor3ub(color_buff[k],color_buff[k+1],color_buff[k+2]);
                 glVertex3f(cloud->points[i].x, cloud->points[i].y, cloud->points[i].z);
+            }
         glEnd();
         
     }
@@ -300,6 +349,9 @@ protected:
     image_geometry::PinholeCameraModel model;
     PointCloud::Ptr cloud;
     boost::mutex buffer_mutex;
+    
+    Colorize depthColor;
+    unsigned char* color_buff;
 
 };
 

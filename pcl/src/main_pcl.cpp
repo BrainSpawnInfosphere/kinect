@@ -91,6 +91,13 @@ cv::Mat dummy(480,640,CV_8UC1);
 
 /*----------------------- GLUT Callbacks --------------------------------*/
 
+int window = 0;
+int rotangles[2] = {0}; // Panning angles
+float zoom = 1;         // zoom factor
+int mx=-1,my=-1;        // Prevous mouse coordinates
+
+
+/*
 void initRendering() {
     //...
     glEnable(GL_LIGHTING); //Enable lighting
@@ -100,11 +107,63 @@ void initRendering() {
     glShadeModel(GL_SMOOTH); //Enable smooth shading
     //...
 }
+*/
 
+bool mouseMove = false;
+
+void mouseMoved(int x, int y){
+    if(!mouseMove) return;
+    
+    if (1 /*mx>=0 && my>=0*/) {
+        rotangles[0] += y-my;
+        rotangles[1] += x-mx;
+    }
+    mx = x;
+    my = y;
+}
+
+void mousePress(int button, int state, int x, int y){
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+        mx = x;
+        my = y;
+        
+        mouseMove = true;
+    }
+}
+/*
+void LoadVertexMatrix()
+{
+    float fx = 594.21f;
+    float fy = 591.04f;
+    float a = -0.0030711f;
+    float b = 3.3309495f;
+    float cx = 339.5f;
+    float cy = 242.7f;
+    GLfloat mat[16] = {
+        1/fx,     0,  0, 0,
+        0,    -1/fy,  0, 0,
+        0,       0,  0, a,
+        -cx/fx, cy/fy, -1, b
+    };
+    glMultMatrixf(mat);
+}
+
+
+void LoadRGBMatrix()
+{
+    float mat[16] = {
+        5.34866271e+02,   3.89654806e+00,   0.00000000e+00,   1.74704200e-02,
+        -4.70724694e+00,  -5.28843603e+02,   0.00000000e+00,  -1.22753400e-02,
+        -3.19670762e+02,  -2.60999685e+02,   0.00000000e+00,  -9.99772000e-01,
+        -6.98445586e+00,   3.31139785e+00,   0.00000000e+00,   1.09167360e-02
+    };
+    glMultMatrixf(mat);
+}
+*/
 // default display function, gets called once each loop through glut
 void display(){
 
-    if(1){
+    if(0){
         glClear (GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
         glLoadIdentity ();             // clear the matrix 
         // viewing transformation  
@@ -124,30 +183,38 @@ void display(){
 #endif        
         
     }
+    else {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glLoadIdentity();
     
-    if(0){
-        //Add ambient light
-        GLfloat ambientColor[] = {0.9f, 0.9f, 0.9f, 1.0f}; //Color (0.2, 0.2, 0.2)
-        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
-        
-        //Set up the material
-        //The color of the object
-        GLfloat materialColor[] = {0.2f, 0.5f, 0.2f, 1.0f};
-        //The specular (shiny) component of the material
-        //GLfloat materialSpecular[] = {0.8f, 0.8f, 0.8f, 1.0f};
-        //The color emitted by the material
-        //GLfloat materialEmission[] = {0, 0, 0, 1.0f};
-        
-        glDisable(GL_COLOR_MATERIAL); //Required for the glMaterial calls to work
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, materialColor);
+        glPushMatrix();
+        glScalef(zoom,zoom,1);
+        glTranslatef(0,0,-3.5);
+        glRotatef(rotangles[0], 1,0,0);
+        glRotatef(rotangles[1], 0,1,0);
+        glTranslatef(0,0,1.5);
+    
+        //LoadVertexMatrix();
+    
+        // Set the projection from the XYZ to the texture image
+        //glMatrixMode(GL_TEXTURE);
+        //glLoadIdentity();
+        //glScalef(1/640.0f,1/480.0f,1);
+        //LoadRGBMatrix();
+        //LoadVertexMatrix();
+        glMatrixMode(GL_MODELVIEW);
     }
+    
+ 
     
     //glutSolidSphere(0.05f, 15, 8);
     
     cm->gl();
+    
+    glPopMatrix();
 
     // draw the updated scene
-    glFlush();
+    //glFlush();
     glutSwapBuffers();
 }
 
@@ -161,22 +228,23 @@ void reshape(int width,int height)
    glViewport (0, 0, (GLsizei) w, (GLsizei) h); 
    glMatrixMode (GL_PROJECTION);
    glLoadIdentity ();
-   //glFrustum (-10.0, 10.0, -10.0, 10.0, 1.5, 20000.0);
-   //glFrustum (0.0, 640.0, 0.0, 480.0, 1.5, 20000.0);
-   gluPerspective(45.0,w/h,0.50,20000.0);
-   //GLfloat nRange = 1000.0f;
-   //glOrtho (-nRange, nRange, -nRange*h/w, nRange*h/w, -nRange, nRange);
+   gluPerspective(45.0,w/h,0.5,200.0);
    glMatrixMode (GL_MODELVIEW);
 }
 
 
 // this routine gets called when a normal key is pressed
-void key(unsigned char ch,int x,int y)
-{
+void key(unsigned char key,int x,int y){
     // ESC = 27
-    if (ch == 'q' || ch == 'Q' || ch == 27)
-    {
+    if (key == 'q' || key == 'Q' || key == 27){
+        glutDestroyWindow(window);
         exit(0);
+    }
+    if (key == 'w') zoom *= 1.1f;
+    if (key == 's') zoom /= 1.1f;
+    if (key == 'r'){
+        rotangles[0] = rotangles[1] = 0;
+        zoom = 1;
     }
 }
 
@@ -202,7 +270,9 @@ void glutSetup(void) {
     //  Request double buffered, true color window with Z buffering at 600x600
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
     glutInitWindowSize(display_size_init,display_size_init);
-    glutCreateWindow("Visualization");
+    glutInitWindowPosition(0, 0);
+    
+    window = glutCreateWindow("Visualization");
 
     //  Set GLUT callbacks
     glutDisplayFunc(display);
@@ -213,6 +283,8 @@ void glutSetup(void) {
     //glutPassiveMotionFunc(motion);
     //glutMouseFunc(mouse);
     //glutMotionFunc(active_motion);
+    glutMotionFunc(&mouseMoved);
+    glutMouseFunc(&mousePress);
     glutIdleFunc(idle);
     atexit(cleanup);
     

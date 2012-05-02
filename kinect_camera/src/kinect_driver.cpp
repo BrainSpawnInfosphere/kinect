@@ -123,9 +123,9 @@ KinectDriver::KinectDriver (ros::NodeHandle comm_nh, ros::NodeHandle param_nh)
   depth_image_.header.frame_id = kinect_depth_frame;
   depth_image_.height = height_;
   depth_image_.width = width_;
-  depth_image_.encoding = "mono8";
-  depth_image_.step = width_;
-  depth_image_.data.resize(width_ * height_);
+  depth_image_.encoding = "mono16"; //"mono8";
+  depth_image_.step = width_ * sizeof(unsigned short);
+  depth_image_.data.resize(width_ * height_ * sizeof(unsigned short) );
 
   // Assemble the image data
   std::string kinect_RGB_frame;
@@ -746,6 +746,9 @@ void KinectDriver::updateDeviceSettings()
 
 void KinectDriver::depthBufferTo8BitImage(const freenect_depth * buf)
 {
+    memcpy((void*)&depth_image_.data[0], (void*)buf, width_*height_*sizeof(unsigned short));
+    return;
+    
   double fT = depth_model_.fx() * baseline_;
   
   for (int y=0; y<height_; ++y)
