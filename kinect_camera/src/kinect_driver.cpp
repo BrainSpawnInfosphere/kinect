@@ -649,11 +649,28 @@ void
       ////////////////////////////////
       // FIXME
       ////////////////////////////////
+#if 1 // old
       IplImage ipl = rgb_rect_;
       sensor_msgs::ImagePtr msg_ptr = sensor_msgs::CvBridge::cvToImgMsg(&ipl, "rgb8");
       msg_ptr->header.stamp = time;
       msg_ptr->header.frame_id = rgb_info_.header.frame_id;
       pub_rgb_rect_.publish(msg_ptr);
+
+#else // new - check       
+      // convert OpenCV image to ROS message
+      // http://www.ros.org/wiki/cv_bridge/Tutorials/UsingCvBridgeToConvertBetweenROSImagesAndOpenCVImages
+        // or cv_bridge::CvImagePtr cv_ptr;
+        cv_bridge::CvImage cvi;
+        cvi.header.stamp = time;
+        cvi.header.frame_id = rgb_info_.header.frame_id;
+        cvi.encoding = "rgb8";
+        cvi.image = rgb_rect_;
+        
+        //sensor_msgs::Image im;
+        //cvi.toImageMsg(im);
+        
+        pub_rgb_rect_.publish(cvi);
+#endif      
     }
   }
 

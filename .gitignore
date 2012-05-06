@@ -8,7 +8,7 @@ Debug
 freenect/libfreenect
 */bin/*
 */lib/*
-build
+*/build
 kinect_camera/docs
 kinect_camera/cfg
 kinect_camera/src/kinect_camera

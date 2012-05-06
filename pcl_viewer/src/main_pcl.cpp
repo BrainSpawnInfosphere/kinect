@@ -160,6 +160,27 @@ void LoadRGBMatrix()
     glMultMatrixf(mat);
 }
 */
+
+
+void GLViewer::drawAxis(float scale){
+    glBegin(GL_LINES);
+    glLineWidth(4);
+    glColor4f (0.9, 0, 0, 1.0);
+    glVertex3f(0, 0, 0);
+    glColor4f (0.9, 0, 0, 0.0);
+    glVertex3f(scale, 0, 0);
+    glColor4f (0, 0.9, 0, 1.0);
+    glVertex3f(0, 0, 0);
+    glColor4f (0, 0.9, 0, 0.0);
+    glVertex3f(0, scale, 0);
+    glColor4f (0, 0, 0.9, 1.0);
+    glVertex3f(0, 0, 0);
+    glColor4f (0, 0, 0.9, 0.0);
+    glVertex3f(0, 0, scale);
+    glEnd();
+}
+
+
 // default display function, gets called once each loop through glut
 void display(){
 
@@ -297,7 +318,7 @@ void glutSetup(void) {
 int main(int argc, char *argv[])
 {
     // init ROS stuff
-    ros::init(argc, argv, "pcl");
+    ros::init(argc, argv, "pcl_view");
     ros::NodeHandle n;
     ros::Rate loop_rate(100);
     ROS_INFO("Start");

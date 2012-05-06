@@ -1,5 +1,5 @@
 <package>
-  <description brief="pcl">
+  <description brief="pcl_viewer">
 
      A Kinect depth image (uint16_t) viewer which builds a point cloud
      and displays it using Glut.
@@ -9,7 +9,6 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/kinect_camera</url>
-  <depend package="opencv2"/>
   <depend package="roscpp"/>
   <depend package="sensor_msgs"/>
   <depend package="geometry_msgs"/>
@@ -20,8 +19,8 @@
   <depend package="camera_info_manager"/>
   <depend package="cv_bridge"/>
   
-  <!--rosdep name="pcl" />
-  <rosdep name="opencv" /-->
+  <rosdep name="pcl" />
+  <rosdep name="opencv2"/>
 
 </package>
 
