@@ -28,7 +28,7 @@
   <depend package="sensor_msgs" />
   <depend package="dynamic_reconfigure" />
   <depend package="cv_bridge" />
-  <depend package="freenect" />
+  <!--depend package="freenect" /-->
   
   <!--rosdep name="libfreenect" /-->
   <rosdep name="eigen" />

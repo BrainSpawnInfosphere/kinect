@@ -15,9 +15,11 @@ This stack was resurrected from the old kinect tools which used libfreenect.
 ### Homebrew Dependencies
 The required homebrew formulas can be applied using:
 
+    cd kinect/homebrew
     brew update
     brew install -v ./pcl.rb
-    brew install -v ./libusb.rb
+    brew install -v ./libusb-freenect.rb
+    brew install -v ./libfreenect.rb
 
 Note that right now the freenect is a package in this stack. It may be moved as a homebrew install
 the future.
@@ -65,7 +67,7 @@ the future.
 * Figure out what to do with the included freenect package
 
 
-## ROS Node: Kinect Camera Point Cloud Viewer
+## Viewer Node: Kinect Camera Point Cloud Viewer
 
 **Author:** Kevin Walchko
 
@@ -80,23 +82,26 @@ and displays it in 3D. The window allows the user to rotate and zoom the point c
 
 ### Command Line
 
-	rosrun pcl_view pcl_view
+	rosrun viewer pcl_view -c /my/cloud -d /my/image
+
+* c: cloud input
+* d: depth image input
 
 #### Example:
 
- 	rosrun pcl_view pcl_view
+ 	rosrun viewer pcl_view -c "/camera/cloud"
 
 ### To Do
 
 * Clean-up code
-* Handle coloring the point cloud better
+* Handle coloring the point cloud better - it is messed up currently
 * Incorperate the RGB image
 * Allow easy incorperation of pcl filters
 * More optimizations so it runs better
+* Get the cloud size and center the camera on it
 
 
-
-## ROS Node: Kinect Camera Depth Viewer
+## Viewer Node: Kinect Camera Depth Viewer
 
 **Author:** Kevin Walchko
 
@@ -110,12 +115,35 @@ Uses OpenCV to convert the uint16_t image into an image and displays it.
 
 ### Command Line
 
-	rosrun depth_view depth_view
+	rosrun veiwer depth_view /my/image
 
 #### Example:
 
- 	rosrun depth_view depth_view
+ 	rosrun viewer depth_view /camera/image
 
 ### To Do
 
 * Lots
+
+## Other
+
+### Virtualbox (or Other Linux Machine)
+
+You can run the kinect_node on an OSX machine and then run other nodes in virtualbox.
+Assuming two machines, OSX and VB (short for Virtualbox, but could also be another
+real machine running Linux) set them up as follows:
+
+#### OSX (Master)
+
+* Before running any ROS nodes, do "export ROS_HOSTNAME=<IPADDR>" where you put in
+the real IP address of your OSX machine.
+* Launch roscore and kinect_node (and any other nodes you need)
+
+#### VB
+
+* Before running any ROS nodes, do "export ROS_MASTER_URI=http://<IPADDR>:11311" where 
+<IPADDR> is the IP address of your OSX master.
+
+If you have roscore and kinect_node running on OSX, you should be able to do:
+"rosrun image_view image_view image:=/camera/rgb/image_raw" and see an image from
+your kinect camera.

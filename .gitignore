@@ -10,7 +10,8 @@ freenect/libfreenect
 */lib/*
 */build
 kinect_camera/docs
-kinect_camera/cfg
+kinect_camera/cfg/cpp
+*.cfgc
 kinect_camera/src/kinect_camera
 freenect
 arch

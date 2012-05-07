@@ -1,22 +1,42 @@
-/**
- * Todo:
- * - fix command line
- * - break Colorize out into own file
- *   - add point cloud capability im->cloud->im
- *   - handle native ROS Image/Cloud msgs
- */
 
-//---------- ROS ---------------
+#ifndef __COLORIZER_HPP__
+#define __COLORIZER_HPP__
+
+//------------ ROS --------------
 #include <ros/ros.h>
+//#include <image_geometry/pinhole_camera_model.h>
+//#include <camera_info_manager/camera_info_manager.h>
+//#include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
+//#include <sensor_msgs/PointCloud.h>
+//#include <sensor_msgs/PointCloud2.h>
+
+namespace enc = sensor_msgs::image_encodings;
 
 //----------- OpenCV -----------
 #include <opencv2/opencv.hpp>
-#include <opencv2/highgui/highgui.hpp>
+
+/*
+// colors
+float WHITE[] = {1,1,1,1};
+float BLACK[] = {0,0,0,1};
+float DARK[] = {.1,.1,.1,1};
+float LIGHTGRAY[] = {.8,.8,.8,1};
+float LIGHT[] = {.9,.9,.9,1};
+float RED[] = {1,0,0,1};
+float BLUE[] = {0,0,1,1};
+float GREEN[] = {0,1,0,1};
+float ORANGE[] = {1,.5,0,1};
+float LIGHTBLUE[] = {0,1,1,1};
+float PURPLE[] = {1,0,1,1};
+*/
 
 
+/**
+ *
+ */
 class Colorize {
 public:
     Colorize(){
@@ -58,7 +78,7 @@ public:
 	    return dst;
 	}
 	
-protected:
+//protected:
 
 	// From libfreenect - colorizes 16b depth image
 	inline void depthColor(const unsigned short depth, unsigned char* depth_mid){
@@ -106,47 +126,4 @@ protected:
     unsigned short t_gamma[2048];
 };
 
-Colorize color;
-
-// create display image
-cv::Mat img(480, 640, CV_8UC3);
-
-void depthCb( const sensor_msgs::ImageConstPtr& image )
-{
-    // convert to cv image
-    cv_bridge::CvImagePtr bridge;
-        
-    try
-    {
-        if (image->encoding == sensor_msgs::image_encodings::MONO16){
-            bridge = cv_bridge::toCvCopy(image, "mono16");
-            color.convert<unsigned short>(bridge->image,img);
-        }
-        else{
-            ROS_ERROR("Error Cloud::depthCb got: %s",image->encoding.c_str());
-            return;
-        }
-    }
-    catch (cv_bridge::Exception& e)
-    {
-        ROS_ERROR("Failed to transform depth image.");
-        return;
-    }
-    
-    // display
-    cv::imshow("Depth Viewer", img);
-    cv::waitKey(1);
-}
-
-int main( int argc, char* argv[] )
-{
-    ros::init( argc, argv, "depth_viewer" );
-    ros::NodeHandle n;
-    ros::NodeHandle nh("~");
-
-    cv::namedWindow("Depth Viewer");
-    
-    ros::Subscriber sub = n.subscribe("/camera/depth/image_raw", 3, &depthCb);
-    ros::spin();
-}
-
+#endif

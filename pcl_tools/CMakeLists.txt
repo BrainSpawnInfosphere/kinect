@@ -1,5 +1,6 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.8)
 include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+include($ENV{ROS_ROOT}/core/rosbuild/FindPkgConfig.cmake)
 
 # Set the build type.  Options are:
 #  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
@@ -29,23 +30,21 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
-# Download libfreenect
-execute_process(COMMAND cmake -E chdir ${PROJECT_SOURCE_DIR} make -f Makefile.libfreenect
-                RESULT_VARIABLE _make_failed)
-if(_make_failed)
-  message(FATAL_ERROR "Download of libfreenect failed")
-endif(_make_failed)
 
-## From freenect
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/libfreenect/cmake_modules/")
-# Set up installation directories
-include (SetupDirectories)
-# Find packages needed to build library
-find_package(libusb-1.0 REQUIRED)
+#find_package(OpenCV REQUIRED)
+#rosbuild_add_boost_directories()
 
+################ Eigen ##############################
+#pkg_check_modules(EIGEN3 REQUIRED eigen3)
+#if(EIGEN3_FOUND)
+#	message("======== FOUND EIGEN 3 =============")
+#	include_directories(${EIGEN3_INCLUDE_DIRS})
+#endif(EIGEN3_FOUND)
 
-include_directories(libfreenect/include)
-include_directories(libfreenect/src)
-add_subdirectory(libfreenect/src)
-#add_subdirectory(libfreenect/examples)
+################ PCL ##############################
+#find_package(PCL 1.5 REQUIRED)
+#include_directories(${PCL_INCLUDE_DIRS} )
+#link_directories(${PCL_LIBRARY_DIRS})
+#add_definitions(${PCL_DEFINITIONS})
 
+#rosbuild_add_library(pcl_tools src/source.cpp)

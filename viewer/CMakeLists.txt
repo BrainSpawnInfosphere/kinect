@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 2.8.8)
 include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 include($ENV{ROS_ROOT}/core/rosbuild/FindPkgConfig.cmake)
 
@@ -30,14 +30,12 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
-
-#list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
-#set(CMAKE_EXE_LINKER_FLAGS "-framework OpenGL -framework GLUT")
-#find_package(OpenGL REQUIRED)
-#find_package(GLUT REQUIRED)
-#message("--- APPLE ---")
-
 find_package(OpenCV REQUIRED)
+if(OpenCV_FOUND)
+	message("======== FOUND OpenCV ${OpenCV_VERSION} =============")
+	include_directories(${OpenCV_INCLUDE_DIRS})
+endif(OpenCV_FOUND)
+
 rosbuild_add_boost_directories()
 
 ################ libfreenect ############################
@@ -47,28 +45,34 @@ rosbuild_add_boost_directories()
 ################ Eigen ##############################
 pkg_check_modules(EIGEN3 REQUIRED eigen3)
 if(EIGEN3_FOUND)
-	message("======== FOUND EIGEN 3 =============")
+	message("======== FOUND EIGEN ${EIGEN3_VERSION} =============")
 	include_directories(${EIGEN3_INCLUDE_DIRS})
 endif(EIGEN3_FOUND)
 
 ################ PCL ##############################
-find_package(PCL 1.5 REQUIRED)
-include_directories(${PCL_INCLUDE_DIRS} )
-link_directories(${PCL_LIBRARY_DIRS})
-add_definitions(${PCL_DEFINITIONS})
+find_package(PCL 1.5 QUIET REQUIRED common )
+if(PCL_FOUND)
+	message("======== FOUND PCL ${PCL_VERSION} =============")
+	include_directories(${PCL_INCLUDE_DIRS} )
+	link_directories(${PCL_LIBRARY_DIRS})
+	add_definitions(${PCL_DEFINITIONS})
+endif(PCL_FOUND)
 
 ################ GLUT #########################
 find_package(GLUT)
 if(GLUT_FOUND)
-	message("======== FOUND Glut ${GLUT_VERSION} =============")
+	message("======== FOUND Glut =============")
     include_directories(${GLUT_INCLUDE_DIRS} )
     link_directories(${GLUT_LIBRARY_DIRS})
     add_definitions(${GLUT_DEFINITIONS})
 endif(GLUT_FOUND)
 
-rosbuild_add_executable(pcl src/main_pcl.cpp)
-target_link_libraries(pcl  ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${OpenCV_LIBS} ${FREENET_LINKER_FLAGS} ${PCL_LIBRARIES})
+################ OpenCV Viewer #########################
+rosbuild_add_executable(depth_view src/depth_viewer/depth_viewer.cpp)
+target_link_libraries(depth_view ${OpenCV_LIBS})
+
+
+################ PCL Viewer #########################
+rosbuild_add_executable(pcl_view src/pcl_viewer/pcl_viewer.cpp)
+target_link_libraries(pcl_view  ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${PCL_LIBRARIES})
 set(CMAKE_EXE_LINKER_FLAGS "-framework OpenGL")
-#set(CMAKE_EXE_LINKER_FLAGS "-framework OpenGL -framework GLUT")
-
-

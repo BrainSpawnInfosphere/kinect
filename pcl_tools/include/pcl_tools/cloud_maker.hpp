@@ -3,6 +3,7 @@
 #define __CLOUD_MAKER_HPP__
 
 //----------- C++ -------------
+/*
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -12,41 +13,35 @@
 #include <list>
 #include <vector>
 #include <boost/thread/mutex.hpp>
-
+*/
 //------------ PCL -------------
-#include <pcl/io/pcd_io.h>
+//#include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 //#include <pcl/visualization/pcl_visualizer.h>
-#include <pcl/filters/passthrough.h>
+//#include <pcl/filters/passthrough.h>
 //#include <pcl/filters/statistical_outlier_removal.h>
-#include <pcl/filters/voxel_grid.h>
-#include <pcl/features/normal_3d.h>
-#include <pcl/features/fpfh.h>
-#include <iostream>
+//#include <pcl/filters/voxel_grid.h>
+//#include <pcl/features/normal_3d.h>
+//#include <pcl/features/fpfh.h>
+//#include <iostream>
 
 //------------ ROS --------------
 #include <ros/ros.h>
 #include <image_geometry/pinhole_camera_model.h>
-#include <camera_info_manager/camera_info_manager.h>
-#include <image_transport/image_transport.h>
+//#include <camera_info_manager/camera_info_manager.h>
+//#include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
-#include <sensor_msgs/PointCloud.h>
-#include <sensor_msgs/PointCloud2.h>
+//#include <sensor_msgs/PointCloud.h>
+//#include <sensor_msgs/PointCloud2.h>
 
 namespace enc = sensor_msgs::image_encodings;
 
 //----------- OpenCV -----------
 #include <opencv2/opencv.hpp>
-//#include <opencv2/highgui/highgui.hpp>
 
-//----------- Glut & OpenGL -----
-#include <GLUT/glut.h>	 // GLUT
-#include <OpenGL/glu.h>	    // GLU
-#include <OpenGL/gl.h>	    // OpenGL
-
-
+#include "colorizer.hpp"
 
 /*
 #ifndef PI
@@ -78,61 +73,6 @@ float PURPLE[] = {1,0,1,1};
 #include <algorithm>
 #include <limits>
 
-class Colorize {
-public:
-    Colorize(){
-        int i;
-        for (i=0; i<2048; i++) {
-            float v = i/2048.0;
-            v = powf(v, 3)* 6;
-            t_gamma[i] = v*6*256;
-        }
-	}
-	
-	inline void depthColor(const unsigned short depth, unsigned char* depth_mid){
-		int pval = t_gamma[depth];
-		int lb = pval & 0xff;
-		switch (pval>>8) { // switch on significant bits
-			case 0:
-				depth_mid[0] = 255;
-				depth_mid[1] = 255-lb;
-				depth_mid[2] = 255-lb;
-				break;
-			case 1:
-				depth_mid[0] = 255;
-				depth_mid[1] = lb;
-				depth_mid[2] = 0;
-				break;
-			case 2:
-				depth_mid[0] = 255-lb;
-				depth_mid[1] = 255;
-				depth_mid[2] = 0;
-				break;
-			case 3:
-				depth_mid[0] = 0;
-				depth_mid[1] = 255;
-				depth_mid[2] = lb;
-				break;
-			case 4:
-				depth_mid[0] = 0;
-				depth_mid[1] = 255-lb;
-				depth_mid[2] = 255;
-				break;
-			case 5:
-				depth_mid[0] = 0;
-				depth_mid[1] = 0;
-				depth_mid[2] = 255-lb;
-				break;
-			default:
-				depth_mid[0] = 0;
-				depth_mid[1] = 0;
-				depth_mid[2] = 0;
-				break;
-		}
-	}
-
-    unsigned short t_gamma[2048];
-};
 
 namespace enc = sensor_msgs::image_encodings;
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
@@ -311,6 +251,18 @@ public:
         */
         //pub_point_cloud_.publish (cloud_msg);
     }
+    
+    /*
+    void convertToCloudMsg(){
+    	//PointCloud::Ptr cloud_msg(new PointCloud);
+        PointCloud::Ptr cloud_msg(cloud);
+        cloud_msg->header = depth_msg->header;
+        cloud_msg->height = depth_msg->height;
+        cloud_msg->width  = depth_msg->width;
+        cloud_msg->is_dense = false;
+        cloud_msg->points.resize(cloud_msg->height * cloud_msg->width);
+    }
+    */
 
 
     PointCloud::Ptr testCloud(float s=1024.0f) {

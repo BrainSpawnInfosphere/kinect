@@ -8,18 +8,19 @@
 #include <math.h>
 #include <list>
 #include <vector>
+#include <iostream>
+
+//------------ Boost -----------
 #include <boost/thread/mutex.hpp>
 
 //------------ PCL -------------
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
-//#include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/filters/passthrough.h>
 //#include <pcl/filters/statistical_outlier_removal.h>
-#include <pcl/filters/voxel_grid.h>
-#include <pcl/features/normal_3d.h>
-#include <pcl/features/fpfh.h>
-#include <iostream>
+//#include <pcl/filters/voxel_grid.h>
+//#include <pcl/features/normal_3d.h>
+//#include <pcl/features/fpfh.h>
 
 //------------ ROS --------------
 #include <ros/ros.h>
@@ -43,7 +44,8 @@ namespace enc = sensor_msgs::image_encodings;
 #include <OpenGL/glu.h>	    // GLU
 #include <OpenGL/gl.h>	    // OpenGL
 
-#include "cloud_maker.hpp"
+//------------ PCL Tools ---------
+#include <pcl_tools/cloud_maker.hpp>
 
 
 /*
@@ -162,7 +164,7 @@ void LoadRGBMatrix()
 */
 
 
-void GLViewer::drawAxis(float scale){
+void drawAxis(float scale){
     glBegin(GL_LINES);
     glLineWidth(4);
     glColor4f (0.9, 0, 0, 1.0);

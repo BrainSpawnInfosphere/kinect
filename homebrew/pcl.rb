@@ -5,7 +5,7 @@ class Pcl < Formula
   #md5 '63fd633a6306ae9b334131b250a2f893'
   #version '1.4'
   
-  url 'http://dev.pointclouds.org/attachments/download/771/PCL-1.5.1-Source.tar.bz2'
+  url 'http://www.pointclouds.org/assets/files/1.5.1/PCL-1.5.1-Source.tar.bz2'
   md5 'd96479ab65245c64d91a6fe1d803275a'
   version '1.5.1'
   

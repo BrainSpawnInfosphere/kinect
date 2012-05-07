@@ -1,0 +1,28 @@
+<package>
+  <description brief="pcl_tools">
+
+     pcl_tools
+
+  </description>
+  <author>Kevin Walchko</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/pcl_tools</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="image_geometry"/>
+  <depend package="cv_bridge"/>
+  
+  <export>
+    <cpp cflags="-I${prefix}/include" />
+    <!--cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -Wl,-rpath,${prefix}/lib -lpcl_tools"/-->
+  </export>
+  
+  <!--rosdep name="pcl">
+  <rosdep name="opencv2">
+  <rosdep name="eigen"-->
+
+</package>
+
+

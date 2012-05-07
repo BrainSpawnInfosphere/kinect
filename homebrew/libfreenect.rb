@@ -2,13 +2,14 @@ require 'formula'
 
 class Libfreenect <Formula
   # need to define a release so we can do have a known state and md5
-  url 'https://github.com/OpenKinect/libfreenect/tarball/master'
+  #url 'https://github.com/OpenKinect/libfreenect/tarball/master'
+  url 'https://walchko@github.com/walchko/libfreenect.git'
   version 'master'
-  homepage 'http://openkinect.org'
+  homepage 'https://github.com/walchko/libfreenect'
   md5 ''
   
   # warning: libusb-freenect will clobber libusb
-  depends_on 'libusb-freenect'
+  # depends_on 'libusb'
   depends_on 'cmake'
 
   def options
