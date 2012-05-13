@@ -50,7 +50,7 @@ if(EIGEN3_FOUND)
 endif(EIGEN3_FOUND)
 
 ################ PCL ##############################
-find_package(PCL 1.5 QUIET REQUIRED common )
+find_package(PCL 1.5 QUIET REQUIRED common filters)
 if(PCL_FOUND)
 	message("======== FOUND PCL ${PCL_VERSION} =============")
 	include_directories(${PCL_INCLUDE_DIRS} )

@@ -44,15 +44,6 @@ namespace enc = sensor_msgs::image_encodings;
 #include "colorizer.hpp"
 
 /*
-#ifndef PI
-#define PI 3.1415926535897
-#endif
-#ifndef LARGE
-#define LARGE 3.1415926535897
-#endif
-
-using namespace std;
-
 // colors
 float WHITE[] = {1,1,1,1};
 float BLACK[] = {0,0,0,1};
@@ -73,25 +64,24 @@ float PURPLE[] = {1,0,1,1};
 #include <algorithm>
 #include <limits>
 
-
+// should these be global like this or scoped in the class??
 namespace enc = sensor_msgs::image_encodings;
-typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
+//typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
 
 class CloudMaker {
 public:
-    CloudMaker() : cloud (new PointCloud), min(1000,1000,1000), max(-1000,-1000,-1000){
-        color_buff = new unsigned char[640*480*3];
+
+//namespace enc = sensor_msgs::image_encodings;
+//typedef sensor_msgs::image_encodings enc;
+typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
+
+    CloudMaker() : cloud (new PointCloud){
     }
     
     ~CloudMaker(){;}
     
     
     template<typename T> void fillCloud(cv::Mat& depth){
-       
-#if 0    
-        testCloud();
-        return;
-#elif 1     
         
         //ROS_INFO("fillCloud");
         boost::mutex::scoped_lock lock (buffer_mutex);
@@ -104,6 +94,7 @@ public:
         const double shift_offset_ = 1084.0;
         const double baseline_ = 0.075; // 7.5 cm
         const double fT = model.fx() * baseline_;
+        unsigned char rgb[3];
         
         // can I do this in one loop?
         int k=0;
@@ -117,80 +108,26 @@ public:
               continue;
     
             // Fill in XYZ
-            pcl::PointXYZ pt;
+            pcl::PointXYZRGB pt;
+            
+#if 1           
             pt.z = fT / d;
             pt.x = ((u - model.cx()) / model.fx()) * pt.z;
             pt.y = ((v - model.cy()) / model.fy()) * pt.z;
-            
-            checkRange(pt);
-            cloud->points.push_back(pt);
-            //ROS_INFO("%f %f %f",pt.x,pt.y,pt.z);
-            
-            depthColor.depthColor(pixel,&color_buff[k]);
-          }
-        }
-#elif 0 // not sure value? use pinhole camerea model ray to 3d    
-        
-        //ROS_INFO("fillCloud");
-        boost::mutex::scoped_lock lock (buffer_mutex);
-        cloud->width = cloud->height = 0;
-        cloud->resize(0);
-        
-        const int width_ = depth.cols;
-        const int height_ = depth.rows;
-        const double SHIFT_SCALE = 0.125;
-        const double shift_offset_ = 1084.0;
-        const double baseline_ = 0.075; // 7.5 cm
-        const double fT = model.fx() * baseline_;
-        
-        // can I do this in one loop?
-        int k = 0;
-        for (int v = 0; v < height_; ++v) // rows
-        {
-          for (int u = 0; u < width_; ++u, ++k) // cols
-          {
-            double d = SHIFT_SCALE * (shift_offset_ - (double)(depth.at<T>(v,u))); // disparity
-            if (d <= 0.0) // div by zero
-              continue;
-    
-            // Fill in XYZ
-            pcl::PointXYZ pt;
-            
+#else
             cv::Point2d p2(u,v);
             cv::Point3d p3 = fT/d*model.projectPixelTo3dRay(p2);
             pt.x = p3.x;
             pt.y = p3.y;
             pt.z = p3.z;
-            
-            cloud->points.push_back(pt);
-            
-          }
-        }    
-#else             
-        // Generate pointcloud data
-        boost::mutex::scoped_lock lock (buffer_mutex);
-        if(cloud->width != 640.0*480.0){
-            cloud->width = 640.0f*480.0f;
-            cloud->height = 1;
-            cloud->points.resize (cloud->width * cloud->height);
-        }
-        
-        //float max = -1.0;
-        //float min = 1000000.0;
-        
-        for(int i=0;i<480;++i)
-            for(int j=0;j<640;++j){
-                cloud->points[j+i*640].x = j;
-                cloud->points[j+i*640].y = i;
-                cloud->points[j+i*640].z = (float)(depth.at<T>(i,j));
-                
-                //max = (cloud->points[j+i*640].z > max ? cloud->points[j+i*640].z : max);
-                //min = (cloud->points[j+i*640].z < min ? cloud->points[j+i*640].z : min);
-            }
-                
-        //ROS_INFO("max %f min %f",max,min);       
-#endif   
 
+#endif            
+            depthColor.depthColor(pixel,rgb);
+            pack(pt,rgb[0],rgb[1],rgb[2]);
+            cloud->points.push_back(pt);
+            //ROS_INFO("%f %f %f",pt.x,pt.y,pt.z);
+          }
+        }
         
     }
 
@@ -283,43 +220,33 @@ public:
 
     }
     
-    void gl(){
-        //glShadeModel(GL_FLAT);
-        boost::mutex::scoped_lock lock (buffer_mutex);
-        glBegin(GL_POINTS);
-            int k=0;
-            for (size_t i = 0; i < cloud->points.size (); ++i, k+=3) {
-                glColor3ub(color_buff[k],color_buff[k+1],color_buff[k+2]);
-                glVertex3f(cloud->points[i].x, cloud->points[i].y, cloud->points[i].z);
-            }
-        glEnd();
-        
-    }
-    
-    void getRange(pcl::PointXYZ& a, pcl::PointXYZ& b){
-    	a = min;
-    	b = max;
-    }
+    inline PointCloud::Ptr getCloud(){ return cloud; }
 
+	/**
+	 * Static member function to unpack the r, g, and b colors from the point 
+	 * cloud. Got this form pointclouds.org.
+	 */
+	static void unpack(pcl::PointXYZRGB& p, uint8_t& r, uint8_t& g, uint8_t& b){
+		 // unpack rgb into r/g/b
+		 uint32_t rgb = *reinterpret_cast<int*>(&p.rgb);
+		 r = (rgb >> 16) & 0x0000ff;
+		 g = (rgb >> 8)  & 0x0000ff;
+		 b = (rgb)       & 0x0000ff;
+ 	}
+ 	
 protected:
-	inline void checkRange(const pcl::PointXYZ& p){
-		if(p.x < min.x) min.x = p.x;
-		if(p.y < min.y) min.y = p.y;
-		if(p.z < min.z) min.z = p.z;
-		
-		if(p.x > max.x) max.x = p.x;
-		if(p.y > max.y) max.y = p.y;
-		if(p.z > max.z) max.z = p.z;
-	}
 	
+	inline void pack(pcl::PointXYZRGB& p, const uint8_t r, const uint8_t g, const uint8_t b){
+		// pack r/g/b into rgb
+		 uint32_t rgb = ((uint32_t)r << 16 | (uint32_t)g << 8 | (uint32_t)b);
+		 p.rgb = *reinterpret_cast<float*>(&rgb);
+	 }
+ 	
     image_geometry::PinholeCameraModel model;
     PointCloud::Ptr cloud;
     boost::mutex buffer_mutex;
     
     Colorize depthColor;
-    unsigned char* color_buff;
-    
-    pcl::PointXYZ min, max;
 
 };
 
