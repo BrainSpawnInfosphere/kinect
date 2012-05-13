@@ -141,6 +141,10 @@ namespace kinect_camera
       ros::Publisher pub_depth_points_, pub_depth_points2_;
       ros::Publisher pub_rgb_points_, pub_rgb_points2_;
       ros::Publisher pub_imu_;
+      
+      /** \brief ROS Services. */
+      ros::ServiceServer srv_tilt;
+      ros::ServiceServer srv_led;
 
       /** \brief Camera info manager objects. */
       boost::shared_ptr<camera_info_manager::CameraInfoManager> rgb_info_manager_, depth_info_manager_;

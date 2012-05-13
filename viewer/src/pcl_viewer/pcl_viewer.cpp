@@ -164,7 +164,7 @@ void LoadRGBMatrix()
 */
 
 
-void drawAxis(float scale){
+void drawAxes(float scale){
     glBegin(GL_LINES);
     glLineWidth(4);
     glColor4f (0.9, 0, 0, 1.0);
@@ -186,7 +186,10 @@ void drawAxis(float scale){
 // default display function, gets called once each loop through glut
 void display(){
 
-    if(0){
+	pcl::PointXYZ min, max;
+	cm->getRange(min,max);
+    	
+    if(1){
         glClear (GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
         glLoadIdentity ();             // clear the matrix 
         // viewing transformation  
@@ -200,9 +203,16 @@ void display(){
                    320.0, 240.0, 100.0, // center
                    0.0, 1.0, 0.0); // up
 #elif 1   
-        gluLookAt (0.0, 1.0, 1.0, // eye
-                   0.0, 0.0, 0.50, // center
-                   0.0, 1.0, 0.0); // up
+		float cx = (max.x - min.x)/2.0f;
+		float cy = (max.y - min.y)/2.0f;
+		float cz = (max.z - min.z)/2.0f;
+		float eye = 5.0f;
+        gluLookAt (cx, -cy, -eye, // eye
+                   cx, cy, cz, // center
+                   0.0, -1.0, 0.0); // up
+                   
+        glRotatef(rotangles[0], 1,0,0);
+        glRotatef(rotangles[1], 0,1,0);
 #endif        
         
     }
@@ -212,7 +222,10 @@ void display(){
     
         glPushMatrix();
         glScalef(zoom,zoom,1);
+        
         glTranslatef(0,0,-3.5);
+        //glTranslatef();
+        
         glRotatef(rotangles[0], 1,0,0);
         glRotatef(rotangles[1], 0,1,0);
         glTranslatef(0,0,1.5);
@@ -231,6 +244,7 @@ void display(){
  
     
     //glutSolidSphere(0.05f, 15, 8);
+    drawAxes(3.0);
     
     cm->gl();
     
@@ -314,6 +328,10 @@ void glutSetup(void) {
     //initRendering(); // turn on lighting
 
     glutPostRedisplay();
+    
+    ROS_INFO("-----------------------------------------");
+    ROS_INFO("OpenGL Version %s",glGetString(GL_VERSION));
+    ROS_INFO("-----------------------------------------");
 }
 
 

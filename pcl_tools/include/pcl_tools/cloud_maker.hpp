@@ -79,7 +79,7 @@ typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
 
 class CloudMaker {
 public:
-    CloudMaker() : cloud (new PointCloud){
+    CloudMaker() : cloud (new PointCloud), min(1000,1000,1000), max(-1000,-1000,-1000){
         color_buff = new unsigned char[640*480*3];
     }
     
@@ -122,8 +122,7 @@ public:
             pt.x = ((u - model.cx()) / model.fx()) * pt.z;
             pt.y = ((v - model.cy()) / model.fy()) * pt.z;
             
-            //if(pt.z < 0.01) continue;
-            
+            checkRange(pt);
             cloud->points.push_back(pt);
             //ROS_INFO("%f %f %f",pt.x,pt.y,pt.z);
             
@@ -296,14 +295,31 @@ public:
         glEnd();
         
     }
+    
+    void getRange(pcl::PointXYZ& a, pcl::PointXYZ& b){
+    	a = min;
+    	b = max;
+    }
 
 protected:
+	inline void checkRange(const pcl::PointXYZ& p){
+		if(p.x < min.x) min.x = p.x;
+		if(p.y < min.y) min.y = p.y;
+		if(p.z < min.z) min.z = p.z;
+		
+		if(p.x > max.x) max.x = p.x;
+		if(p.y > max.y) max.y = p.y;
+		if(p.z > max.z) max.z = p.z;
+	}
+	
     image_geometry::PinholeCameraModel model;
     PointCloud::Ptr cloud;
     boost::mutex buffer_mutex;
     
     Colorize depthColor;
     unsigned char* color_buff;
+    
+    pcl::PointXYZ min, max;
 
 };
 

@@ -214,14 +214,13 @@ KinectDriver::KinectDriver (ros::NodeHandle comm_nh, ros::NodeHandle param_nh)
     pub_rgb_points_    = comm_nh.advertise<sensor_msgs::PointCloud> ("rgb/points", 15);
     pub_rgb_points2_   = comm_nh.advertise<sensor_msgs::PointCloud2>("rgb/points2", 15);
     pub_imu_ = comm_nh.advertise<sensor_msgs::Imu>("imu", 15);
+    
 }
 
 /** \brief Initialize a Kinect device, given an index.
   * \param index the index of the device to initialize
   */
-bool
-KinectDriver::init (int index)
-{
+bool KinectDriver::init (int index){
     // Initialize the USB
     if (freenect_init (&f_ctx_, NULL) < 0)
     {
@@ -260,6 +259,7 @@ KinectDriver::init (int index)
 
     return (true);
 }
+
 
 void KinectDriver::depthCbInternal (freenect_device *dev, void *buf, uint32_t timestamp)
 {

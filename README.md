@@ -13,16 +13,19 @@
 This stack was resurrected from the old kinect tools which used libfreenect.
 
 ### Homebrew Dependencies
-The required homebrew formulas can be applied using:
+The required homebrew formulas for OSX can be installed using:
 
     cd kinect/homebrew
     brew update
     brew install -v ./pcl.rb
+    brew uninstall libusb
     brew install -v ./libusb-freenect.rb
     brew install -v ./libfreenect.rb
 
-Note that right now the freenect is a package in this stack. It may be moved as a homebrew install
-the future.
+Note that the USB library used here is *not* the standard USB library but a
+patched version specifically used for the Kinect. Also, this library will install
+over (replace) the standard USB library if you have installed it already. This is 
+why it is uninstalled before installing libusb-freenect.
 
 ## ROS Node: Kinect Camera Node
 
