@@ -40,7 +40,8 @@
 
 #include "kinect_camera/kinect.h"
 #include <sensor_msgs/image_encodings.h>
-#include <cv_bridge/CvBridge.h>
+//#include <cv_bridge/CvBridge.h>
+#include <cv_bridge/cv_bridge.h> // switches between cv and ros image formats 
 #include <boost/make_shared.hpp>
 //#include <libfreenect.h>
 //#include <libfreenect_sync.h>
@@ -648,7 +649,7 @@ void KinectDriver::publish ()
             ////////////////////////////////
             // FIXME
             ////////////////////////////////
-#if 1 // old
+#if 0 // old
             IplImage ipl = rgb_rect_;
             sensor_msgs::ImagePtr msg_ptr = sensor_msgs::CvBridge::cvToImgMsg(&ipl, "rgb8");
             msg_ptr->header.stamp = time;
@@ -665,10 +666,10 @@ void KinectDriver::publish ()
             cvi.encoding = "rgb8";
             cvi.image = rgb_rect_;
 
-            //sensor_msgs::Image im;
-            //cvi.toImageMsg(im);
+            sensor_msgs::Image im;
+            cvi.toImageMsg(im);
 
-            pub_rgb_rect_.publish(cvi);
+            pub_rgb_rect_.publish(im);
 #endif
         }
     }

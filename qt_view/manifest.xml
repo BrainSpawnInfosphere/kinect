@@ -1,0 +1,29 @@
+<package>
+  <description brief="depth_view">
+  	
+  	A Kinect depth image (uint16_t) viewer which builds a point cloud
+     and displays it using Glut.
+     
+  	depth_view
+  
+  </description>
+  <author>Kevin J. Walchko</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url></url>
+  <depend package="roscpp"/>
+  <depend package="sensor_msgs"/>
+  <depend package="cv_bridge"/>
+  <depend package="geometry_msgs"/>
+  <depend package="image_geometry"/>
+  <depend package="tf"/>
+  <depend package="std_msgs"/>
+  <depend package="image_transport"/>
+  <depend package="camera_info_manager"/>
+  <depend package="pcl_tools"/>
+  
+  <rosdep name="pcl" />
+  <rosdep name="opencv2"/>
+  <rosdep name="qt"/>
+  
+</package>

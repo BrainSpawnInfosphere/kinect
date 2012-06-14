@@ -12,8 +12,9 @@
 #include <math.h>
 #include <list>
 #include <vector>
-#include <boost/thread/mutex.hpp>
 */
+#include <boost/thread/mutex.hpp>
+
 //------------ PCL -------------
 //#include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
@@ -97,10 +98,10 @@ typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
         unsigned char rgb[3];
         
         // can I do this in one loop?
-        int k=0;
+        //int k=0;
         for (int v = 0; v < height_; ++v) // rows
         {
-          for (int u = 0; u < width_; ++u, k+=3) // cols
+          for (int u = 0; u < width_; ++u /*, k+=3*/) // cols
           {
             unsigned short pixel = depth.at<T>(v,u);
             double d = SHIFT_SCALE * (shift_offset_ - (double)(pixel)); // disparity
@@ -174,6 +175,9 @@ typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
             ROS_ERROR("Error Cloud::depthCb got: %s",depth_msg->encoding.c_str());
             return;
         }
+        
+        // perform additional user processing from the virtual function
+        process();
 
         /*
         //ROS_INFO("depthCb");
@@ -200,7 +204,7 @@ typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
     }
     */
 
-
+	/*
     PointCloud::Ptr testCloud(float s=1024.0f) {
 
         // Generate pointcloud data
@@ -219,6 +223,7 @@ typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
         return cloud;
 
     }
+    */
     
     inline PointCloud::Ptr getCloud(){ return cloud; }
 
@@ -235,6 +240,8 @@ typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
  	}
  	
 protected:
+
+	virtual void process() = 0;
 	
 	inline void pack(pcl::PointXYZRGB& p, const uint8_t r, const uint8_t g, const uint8_t b){
 		// pack r/g/b into rgb

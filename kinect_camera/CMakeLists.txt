@@ -5,7 +5,7 @@ include ($ENV{ROS_ROOT}/core/rosbuild/FindPkgConfig.cmake)
 set (ROS_BUILD_TYPE RelWithDebInfo)
 rosbuild_init ()
 rosbuild_add_boost_directories ()
-add_definitions (-Wall -O3 -Winvalid-pch -pipe -funroll-loops)
+add_definitions (-Wall -O3 -Winvalid-pch -pipe -funroll-loops -Wno-dev -lpthread)
 rosbuild_check_for_sse ()
 
 set (EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
@@ -13,16 +13,18 @@ include_directories (${CMAKE_CURRENT_BINARY_DIR})
 
 
 ################ OpenCV #################################
-find_package(OpenCV REQUIRED)
+find_package(OpenCV REQUIRED core)
+message("OpenCV: ${FREENET_LINKER_FLAGS}")
 
 ################ USB ####################################
 pkg_check_modules (LIBUSB REQUIRED libusb-1.0)
 include_directories (${LIBUSB_INCLUDE_DIRS})
 link_directories (${LIBUSB_LIBRARY_DIRS})
+message("======== USB ${LIBUSB_VERSION} =============")
 
 ################ libfreenect ############################
 # NOTE: you may have to edit where you installed libfreenect if not using homebrew
-set(FREENET_LINKER_FLAGS "-L/usr/local/lib -Wl,-rpath,/usr/local/lib -lfreenect ")
+set(FREENET_LINKER_FLAGS "-L/usr/local/lib -Wl,-rpath,/usr/local/lib -lfreenect")
 include_directories("/usr/local/include/libfreenect")
 
 ################ Dynamic reconfigure ####################

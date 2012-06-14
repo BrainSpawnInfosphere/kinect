@@ -30,8 +30,13 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
+find_package(OpenCV REQUIRED core)
+if(OpenCV_FOUND)
+	message("======== FOUND OpenCV ${OpenCV_VERSION} =============")
+	include_directories(${OpenCV_INCLUDE_DIRS})
+	message("${OpenCV_LIBRARIES}")
+endif(OpenCV_FOUND)
 
-#find_package(OpenCV REQUIRED)
 rosbuild_add_boost_directories()
 
 ################ Eigen ##############################
@@ -64,6 +69,26 @@ if(QT_FOUND)
 	message("--${QT_LIBS}")
 endif(QT_FOUND)
 
-rosbuild_add_library(viewer_3d src/viewer_3d.cpp)
-target_link_libraries(viewer_3d ${PCL_LIBRARIES} ${QT_LIBRARIES})
-set(CMAKE_SHARED_LINKER_FLAGS "-framework OpenGL -F/usr/local/Cellar/libqglviewer/2.3.15 -framework QGLViewer -F/usr/local/Cellar/qt/4.8.0/lib -framework QtCore -framework QtOpenGL -framework QtXml -framework QtGui")
+# OpenGL
+find_package(OpenGL REQUIRED)
+include_directories( ${QT_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR} /usr/local/Cellar/libqglviewer/2.3.15/QGLViewer.framework/Headers )
+
+################ OpenCV Viewer #########################
+#rosbuild_add_executable(depth_view src/depth_viewer/depth_viewer.cpp)
+#target_link_libraries(depth_view ${OpenCV_LIBS})
+
+
+################ PCL Viewer #########################
+#rosbuild_add_executable(pcl_view src/pcl_viewer/pcl_viewer.cpp)
+#target_link_libraries(pcl_view  ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${PCL_LIBRARIES})
+#set(CMAKE_EXE_LINKER_FLAGS "-framework OpenGL")
+
+#rosbuild_add_executable(aaa src/test3/main.cpp)
+#target_link_libraries(aaa ${OPENGL_LIBRARY} ${PCL_LIBRARIES} ${QT_LIBRARIES})
+#set(CMAKE_EXE_LINKER_FLAGS "-framework OpenGL -F/usr/local/Cellar/libqglviewer/2.3.15 -framework QGLViewer -F/usr/local/Cellar/qt/4.8.0/lib -framework QtCore -framework QtOpenGL -framework QtXml -framework QtGui")
+
+
+################ PCL Ball Viewer #########################
+rosbuild_add_executable(ball src/ball_cloud/main.cpp)
+target_link_libraries(ball ${OPENGL_LIBRARY} ${PCL_LIBRARIES} ${QT_LIBRARIES})
+set(CMAKE_EXE_LINKER_FLAGS "-framework OpenGL -F/usr/local/Cellar/libqglviewer/2.3.15 -framework QGLViewer -F/usr/local/Cellar/qt/4.8.0/lib -framework QtCore -framework QtOpenGL -framework QtXml -framework QtGui")

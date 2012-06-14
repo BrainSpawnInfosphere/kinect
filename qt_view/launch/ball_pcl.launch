@@ -1,0 +1,6 @@
+<launch>
+    <node pkg="qt_view" type="ball" name="ball" output="screen">
+    	<!--remap from="image_in" to="/camera/rgb/image_raw" /-->
+    	<!--param name="debug" type="bool" value="true" /-->
+    </node>
+</launch>

@@ -2,6 +2,8 @@
 *~
 *.bak
 doc
+old
+*copy*
 .project
 .cproject
 Debug
