@@ -8,8 +8,8 @@ class Libfreenect <Formula
   homepage 'https://github.com/walchko/libfreenect'
   md5 ''
   
-  # warning: libusb-freenect will clobber libusb
-  # depends_on 'libusb'
+  # warning: libusb 1.09 has patches to work with libfreenect
+  depends_on 'libusb'
   depends_on 'cmake'
 
   def options

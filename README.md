@@ -10,7 +10,8 @@
 
 **Website:** http://github.com/walchko/kinect
 
-This stack was resurrected from the old kinect tools which used libfreenect.
+This stack was resurrected from the old kinect tools which used libfreenect. I have had
+various difficulties getting OpenNI libraries working on OSX.
 
 ### Homebrew Dependencies
 The required homebrew formulas for OSX can be installed using:
@@ -18,12 +19,11 @@ The required homebrew formulas for OSX can be installed using:
     cd kinect/homebrew
     brew update
     brew install -v ./pcl.rb
-    brew uninstall libusb
-    brew install -v ./libusb-freenect.rb
+    brew install -v libusb
     brew install -v ./libfreenect.rb
 
-Note that the USB library used here is *not* the standard USB library but a
-patched version specifically used for the Kinect. Also, this library will install
+Note that the USB library used here *is* the standard USB library and the patches 
+for the Kinect are included in version 1.09. Also, this library will install
 over (replace) the standard USB library if you have installed it already. This is 
 why it is uninstalled before installing libusb-freenect.
 
@@ -128,7 +128,38 @@ Uses OpenCV to convert the uint16_t image into an image and displays it.
 
 * Lots
 
-## Other
+## PCL Tools
+
+**Author:** Kevin Walchko
+
+**License:** BSD
+
+**Language:** C++
+
+A couple of key tools to make like with ROS and PCL better on OSX:
+
+### Point Cloud Maker
+
+A node that takes in a kinect 16b depth image and converts it to a point cloud. 
+Currently it color codes the points according to depth only.
+
+#### To Do
+
+* Color code each point according to the kinect RGB image.
+
+### Point Cloud Viewer
+
+Actually this takes a kinect 16b depth image and using the CloudMaker node, convert
+it into a point cloud. Then it displays it in an OpenGL 3D widow. This window is 
+for visualization only, so a user modified CloudMaker node could do a lot of things
+to the point cloud before it gets displayed. The main advantage of this is there is 
+no transmission of the point cloud over the network and there is no need to use
+the overly complicated nodelet scheme.  
+
+kinect -> depth_image -> cloud_maker -> viewer
+
+
+## Other Notes
 
 ### Virtualbox (or Other Linux Machine)
 

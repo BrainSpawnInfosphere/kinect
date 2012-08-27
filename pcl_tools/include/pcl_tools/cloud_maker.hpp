@@ -3,28 +3,10 @@
 #define __CLOUD_MAKER_HPP__
 
 //----------- C++ -------------
-/*
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <sys/types.h>
-#include <time.h>
-#include <math.h>
-#include <list>
-#include <vector>
-*/
 #include <boost/thread/mutex.hpp>
 
 //------------ PCL -------------
-//#include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
-//#include <pcl/visualization/pcl_visualizer.h>
-//#include <pcl/filters/passthrough.h>
-//#include <pcl/filters/statistical_outlier_removal.h>
-//#include <pcl/filters/voxel_grid.h>
-//#include <pcl/features/normal_3d.h>
-//#include <pcl/features/fpfh.h>
-//#include <iostream>
 
 //------------ ROS --------------
 #include <ros/ros.h>
@@ -133,7 +115,9 @@ typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
     }
 
     /**
-     * Callback which converts a depth image and camera info into a point cloud
+     * Callback which converts a depth image and camera info into a point cloud. A
+     * virtual function process() is called so that users can define their own 
+     * additional processing.
      */
     void depthCb(const sensor_msgs::ImageConstPtr& depth_msg,
                  const sensor_msgs::CameraInfoConstPtr& info_msg)

@@ -35,22 +35,16 @@
  * Author: Kevin J. Walchko on 3/1/2012
  *********************************************************************
  *
- * This viewer is based off the simple 3D cloud viewer I made and is 
- * specifically designed to identify colored balls using the RGB 
- * image (Hue & Saturation), then using the projected image to find
- * it in the point cloud so distance from the camera is known.
- *
- * depth_image -+
- *              +---> BallFilter ---> position
- *   rgb_image -+ 
+ * Simple 3D point cloud viewer
  *
  * Change Log:
  *  3 Mar 2012 Created
  *
  **********************************************************************
  *
+ *  kinect -> raw_depth_image -> cloud_maker -> cloud_viewer
  *
- *
+ *  
  */
 
 //----------- C++ -------------
@@ -108,7 +102,7 @@ namespace enc = sensor_msgs::image_encodings;
 /**
  * Simple Qt OpenGL viewer that displays point clouds
  */
-class BallFilter : public CloudMaker {
+class Filter : public CloudMaker {
 public:
 
 typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
@@ -173,7 +167,7 @@ int main(int argc, char** argv)
     ros::Rate loop_rate(100);
     ROS_INFO("Start");
     
-	CloudMaker *filter = new BallFilter();
+	CloudMaker *filter = new Filter();
 	
 	Viewer *viewer = new Viewer();
 	viewer->setFPSIsDisplayed(true);
@@ -183,7 +177,7 @@ int main(int argc, char** argv)
 
     image_transport::ImageTransport transport(n);
     image_transport::CameraSubscriber depth_sub = transport.subscribeCamera("/camera/depth/image_raw", 1, 
-    												&BallFilter::depthCb, filter);
+    												&Filter::depthCb, filter);
   
   	viewer->show();
 

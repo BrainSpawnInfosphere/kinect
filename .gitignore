@@ -10,7 +10,8 @@ Debug
 freenect/libfreenect
 */bin/*
 */lib/*
-*/build
+*/build/*
+build
 kinect_camera/docs
 kinect_camera/cfg/cpp
 *.cfgc
