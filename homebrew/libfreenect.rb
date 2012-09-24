@@ -8,7 +8,7 @@ class Libfreenect <Formula
   homepage 'https://github.com/walchko/libfreenect'
   md5 ''
   
-  # warning: libusb 1.09 has patches to work with libfreenect
+  # libusb 1.09 has patches to work with libfreenect
   depends_on 'libusb'
   depends_on 'cmake'
 

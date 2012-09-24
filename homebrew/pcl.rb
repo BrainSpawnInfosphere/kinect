@@ -1,23 +1,37 @@
 require 'formula'
 
+# Seems to compile fine with --use-gcc option
+
 class Pcl < Formula
   #url 'http://dev.pointclouds.org/attachments/download/610/PCL-1.4.0-Source.tar.bz2'
   #md5 '63fd633a6306ae9b334131b250a2f893'
   #version '1.4'
   
-  url 'http://www.pointclouds.org/assets/files/1.5.1/PCL-1.5.1-Source.tar.bz2'
-  md5 'd96479ab65245c64d91a6fe1d803275a'
-  version '1.5.1'
+  #url 'http://www.pointclouds.org/assets/files/1.5.1/PCL-1.5.1-Source.tar.bz2'
+  #md5 'd96479ab65245c64d91a6fe1d803275a'
+  #version '1.5.1'
+  
+  #url 'http://www.pointclouds.org/assets/files/1.6.0/PCL-1.6.0-Source.tar.bz2'
+  #md5 'f83ca5d0ff290412b0807864b95eba26'
+  #version '1.6.0'
+  
+  # brew install pcl --devel
+  #devel do
+    url 'http://svn.pointclouds.org/pcl/trunk', :using => :svn
+    version '1.7.0'
+  #end
   
   homepage 'http://www.pointclouds.org'
   
   depends_on 'cmake'
-  depends_on 'boost'
+  # ROS needs boost 1.49 to compile, it doesn't work with 1.50
+  # git checkout e40bc41 /usr/local/Library/Formula/boost.rb
+  #depends_on 'boost'
   depends_on 'eigen'
   depends_on 'flann'
   depends_on 'vtk'
   depends_on 'qhull'
-  #depends_on 'libusb-freenect'
+  depends_on 'libusb'
 
   depends_on 'doxygen' if ARGV.include? '--doc'
   depends_on 'sphinx' if ARGV.include? '--doc'

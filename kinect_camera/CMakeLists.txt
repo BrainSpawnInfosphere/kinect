@@ -14,7 +14,7 @@ include_directories (${CMAKE_CURRENT_BINARY_DIR})
 
 ################ OpenCV #################################
 find_package(OpenCV REQUIRED core)
-message("OpenCV: ${FREENET_LINKER_FLAGS}")
+message("OpenCV: ${OpenCV_VERSION}")
 
 ################ USB ####################################
 pkg_check_modules (LIBUSB REQUIRED libusb-1.0)

@@ -159,25 +159,145 @@ the overly complicated nodelet scheme.
 kinect -> depth_image -> cloud_maker -> viewer
 
 
-## Other Notes
+# Other Notes (Need to move somewhere else)
 
-### Virtualbox (or Other Linux Machine)
+## Remote Master
 
 You can run the kinect_node on an OSX machine and then run other nodes in virtualbox.
 Assuming two machines, OSX and VB (short for Virtualbox, but could also be another
 real machine running Linux) set them up as follows:
 
-#### OSX (Master)
+### OSX (Master)
 
 * Before running any ROS nodes, do "export ROS_HOSTNAME=<IPADDR>" where you put in
 the real IP address of your OSX machine.
 * Launch roscore and kinect_node (and any other nodes you need)
 
-#### VB
+### VB (Slave)
 
 * Before running any ROS nodes, do "export ROS_MASTER_URI=http://<IPADDR>:11311" where 
-<IPADDR> is the IP address of your OSX master.
+<IPADDR> is the IP address of your the master computer.
 
 If you have roscore and kinect_node running on OSX, you should be able to do:
 "rosrun image_view image_view image:=/camera/rgb/image_raw" and see an image from
 your kinect camera.
+
+# Virtualbox
+
+Not everything runs on OSX right now. There are some difficulties with OpenNI and some of 
+the graphical stuff that makes it necessary to be able to run Linux. However, as a 
+staunch Mac enthusiast, I prefer to run Linux in a virtual machine (vm) rather than get a
+separate computer to run it on.
+
+My typical setup is a Mac as the host computer and Linux in a virtual machine. This allows
+me to run some of the code (OpenNI stuff, SLAM, etc) in the vm and have my Mac connected
+to the hardware. **Note** that you cannot have a vm get access to a Kinect or really any
+useful hardware. 
+
+[kinect] ---> [mac] <---> [vm]
+                ^
+                |
+[robot] <-------+
+
+## Networking
+
+There are several types of networks you can setup for your vm's:
+
+* NAT - each vm is on its own private network using a virtual network device. The vm can 
+ping the host, but the host cannot ping the vm.
+* Bridging - the vm binds to a real network device (wired or wireless) and becomes a
+computer on the network
+* Host Only - all vm's and the host use a virtual network device and can talk to each 
+other, but the vm's are not seen on the network. Make sure to go into the Preferences
+and create a host-only device. This determines the DHCP parameters that will be used.
+
+Also, install the [avahi](avahi.org) tools installed which will implement the Zeroconfig
+(Bonjour) protocol so you can communicate easier with your vm's. To find what is on
+your network, type:
+
+    avahi-discover
+
+This should list all of the vm's and the host computer. Additionally, you should be able
+to get results with:
+
+    ping <HOST>.local
+
+where <HOST> is the name of the host computer.
+
+## SSH Server
+
+You will need to setup your virtual machine (vm) with ssh client and ssh server so you 
+can remotely connect to it. The following are examples of configuration directives you 
+may change in the /etc/ssh/sshd_config file:
+
+To set your OpenSSH to listen on TCP port 2222 instead of the default TCP port 22, change 
+the Port directive as such:
+
+    Port 2222
+
+To have sshd allow public key-based login credentials, simply add or modify the line:
+
+    PubkeyAuthentication yes
+
+To make your OpenSSH server display the contents of the /etc/issue.net file as a 
+pre-login banner, simply add or modify the line:
+
+    Banner /etc/issue.net
+
+After making changes to the /etc/ssh/sshd_config file, save the file, and restart the 
+sshd server application to effect the changes using the following command at a terminal 
+prompt:
+
+    sudo /etc/init.d/ssh restart
+
+or
+
+    sudo restart ssh
+
+Ubuntu allows you to use stop, start, or restart ssh instead of calling the init.d script 
+directly.
+
+### SSH Keys
+SSH keys allow authentication between two hosts without the need of a password. SSH key 
+authentication uses two keys a private key and a public key.
+
+To generate the keys, from a terminal prompt enter:
+
+    ssh-keygen -t dsa
+
+This will generate the keys using a DSA authentication identity of the user. During the 
+process you will be prompted for a password. Simply hit Enter when prompted to create the 
+key with an empty pass phrase.
+
+By default the public key is saved in the file ~/.ssh/id_dsa.pub, while ~/.ssh/id_dsa is 
+the private key. Now copy the id_dsa.pub file to the remote host and append it to 
+~/.ssh/authorized_keys by entering:
+
+    ssh-copy-id username@remotehost
+
+Finally, double check the permissions on the authorized_keys file, only the authenticated 
+user should have read and write permissions. If the permissions are not correct change 
+them by:
+
+    chmod 600 .ssh/authorized_keys
+
+You should now be able to SSH to the host without being prompted for a password.
+
+## Running Headless VMs
+
+You can launch Virtualbox headless on OSX using the following command:
+
+    /Applications/VirtualBox.app/Contents/MacOS/VBoxHeadless --startvm <VM_NAME>
+
+where <VM_NAME> is the name of the vm you want to launch. **Note** that
+in OSX, the this will segfault if you have enabled 3D Acceleration in the Display 
+settings.
+
+## Connecting
+
+Please replace the <HOST> and <USER> with the proper host and user names.
+
+1. launch the vm as described above
+2. double check it is up and running: ping <HOST>.local
+3. login: ssh <USER>@<HOST>.local
+4. Setup ROS environments on host and vm's properly. Run ros nodes ...

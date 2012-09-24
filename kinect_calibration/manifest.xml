@@ -14,7 +14,7 @@
   <depend package="rospack"/> <!-- Only for install_calibration script -->
   <depend package="freenect"/>
   <depend package="opencv2"/>
-  <depend package="eigen"/>
+  <rosdep name="eigen" />
 
   <rosdep name="opengl"/>
   <rosdep name="glut"/>
