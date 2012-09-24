@@ -203,11 +203,12 @@ useful hardware.
 
 There are several types of networks you can setup for your vm's:
 
-* NAT - each vm is on its own private network using a virtual network device. The vm can 
-ping the host, but the host cannot ping the vm.
-* Bridging - the vm binds to a real network device (wired or wireless) and becomes a
-computer on the network
-* Host Only - all vm's and the host use a virtual network device and can talk to each 
+* **NAT** - each vm is on its own private network using a virtual network device. The vm can 
+ping the host, but the host cannot ping the vm. This isn't that useful.
+* **Bridging** - the vm binds to a real network device (wired or wireless) and becomes a
+computer on the network. This is useful when you want to run a vm on one computer and have
+another computer (or vm on another computer) talk with it.
+* **Host Only** - all vm's and the host use a virtual network device and can talk to each 
 other, but the vm's are not seen on the network. Make sure to go into the Preferences
 and create a host-only device. This determines the DHCP parameters that will be used.
 
@@ -220,9 +221,9 @@ your network, type:
 This should list all of the vm's and the host computer. Additionally, you should be able
 to get results with:
 
-    ping <HOST>.local
+    ping <HOSTNAME>.local
 
-where <HOST> is the name of the host computer.
+where <HOSTNAME> is the name of the host computer.
 
 ## SSH Server
 
@@ -295,9 +296,10 @@ settings.
 
 ## Connecting
 
-Please replace the <HOST> and <USER> with the proper host and user names.
+Please replace the <HOSTNAME> and <USERNAME> with the proper host and user names.
 
 1. launch the vm as described above
-2. double check it is up and running: ping <HOST>.local
-3. login: ssh <USER>@<HOST>.local
+2. double check it is up and running: ping <HOSTNAME>.local
+3. login: ssh <USERNAME>@<HOSTNAME>.local
 4. Setup ROS environments on host and vm's properly. Run ros nodes ...
+5. When done ... sudo poweroff
